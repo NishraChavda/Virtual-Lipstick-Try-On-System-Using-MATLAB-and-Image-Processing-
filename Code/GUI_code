@@ -1,0 +1,133 @@
+classdef IP1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure                  matlab.ui.Figure
+        LoadImageButton           matlab.ui.control.Button
+        ColorSpectrumSlider       matlab.ui.control.Slider
+        ColorSpectrumSliderLabel  matlab.ui.control.Label
+        ApplyColorButton          matlab.ui.control.Button
+        UIAxes                    matlab.ui.control.UIAxes
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: LoadImageButton
+        function LoadImageButtonPushed(app, event)
+            global a;
+            [file, path] = uigetfile({'*.jpg*'}, 'Select an Image');
+            filename=strcat(path,file);
+             % Load and display the selected image
+            a= imread(filename);
+            imshow(a, 'Parent', app.UIAxes);
+            
+        end
+
+        % Button pushed function: ApplyColorButton
+        function ApplyColorButtonPushed(app, event)
+            global a;
+            % Convert to HSV color space
+            img=a;
+            h= rgb2hsv(img);
+    
+    % Read hue and saturation values from sliders
+            newHue = app.ColorSpectrumSlider.Value;          % Desired hue for lips
+             % Desired saturation adjustment for lips
+
+    % Define thresholds for detecting the lip color in HSV color space
+            hueMin = 0.7; hueMax = 1.0;
+            satMin = 0.1; satMax = 1.0;
+            valMin = 0.3; valMax = 1.0;
+
+    % Create a binary mask for lip region based on HSV thresholds
+            lipMask = ( h(:,:,1) >= hueMin & h(:,:,1) <= hueMax) & ...
+              (h(:,:,2) >= satMin & h(:,:,2) <= satMax) & ...
+              (h(:,:,3) >= valMin & h(:,:,3) <= valMax);
+
+    % Change the lip color by modifying the hue and saturation channels
+            hsvImageModified = h; % Copy the original HSV image
+            hsvImageModified(:,:,1) = hsvImageModified(:,:,1) .* ~lipMask + newHue * lipMask;  % Set hue in lip region
+            hsvImageModified(:,:,2) = hsvImageModified(:,:,2) .* ~lipMask + 0.8 * lipMask;  % Adjust saturation
+
+    % Convert the modified HSV image back to RGB color space
+            newImage = hsv2rgb(hsvImageModified);
+
+    % Display the result
+            imshow(newImage, 'Parent', app.UIAxes);
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 640 480];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            title(app.UIAxes, 'ImageAxes')
+            xlabel(app.UIAxes, 'X')
+            ylabel(app.UIAxes, 'Y')
+            zlabel(app.UIAxes, 'Z')
+            app.UIAxes.Position = [14 103 551 328];
+
+            % Create ApplyColorButton
+            app.ApplyColorButton = uibutton(app.UIFigure, 'push');
+            app.ApplyColorButton.ButtonPushedFcn = createCallbackFcn(app, @ApplyColorButtonPushed, true);
+            app.ApplyColorButton.Position = [507 440 100 22];
+            app.ApplyColorButton.Text = 'Apply Color';
+
+            % Create ColorSpectrumSliderLabel
+            app.ColorSpectrumSliderLabel = uilabel(app.UIFigure);
+            app.ColorSpectrumSliderLabel.HorizontalAlignment = 'right';
+            app.ColorSpectrumSliderLabel.Position = [188 61 88 22];
+            app.ColorSpectrumSliderLabel.Text = 'Color Spectrum';
+
+            % Create ColorSpectrumSlider
+            app.ColorSpectrumSlider = uislider(app.UIFigure);
+            app.ColorSpectrumSlider.Limits = [0 1];
+            app.ColorSpectrumSlider.Position = [297 70 150 3];
+            app.ColorSpectrumSlider.Value = 0.01;
+
+            % Create LoadImageButton
+            app.LoadImageButton = uibutton(app.UIFigure, 'push');
+            app.LoadImageButton.ButtonPushedFcn = createCallbackFcn(app, @LoadImageButtonPushed, true);
+            app.LoadImageButton.Position = [32 440 100 22];
+            app.LoadImageButton.Text = 'Load Image';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = IP1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end

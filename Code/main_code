@@ -1,0 +1,44 @@
+clc;clear all;
+% Load the image
+image = imread('Nishra.jpg'); 
+imshow(image)
+title('Original Image');
+
+% Convert the image to HSV color space
+hsvImage = rgb2hsv(image);
+imshow(hsvImage)
+title('HSV Image')
+
+% Define thresholds for detecting the lip color in HSV color space
+% These thresholds may need adjustment based on image lighting and lip color
+hueMin = 0.7;  % Lower bound for hue for lips
+hueMax = 1;  % Upper bound for hue for lips
+satMin = 0.1;  % Lower bound for saturation for lips
+satMax = 0.9;  % Upper bound for saturation for lips
+valMin = 0.3;  % Lower bound for value for lips
+valMax = 1;  % Upper bound for value for lips
+
+% Create a binary mask for lip region based on HSV thresholds
+lipMask = (hsvImage(:,:,1) >= hueMin & hsvImage(:,:,1) <= hueMax) & ...
+          (hsvImage(:,:,2) >= satMin & hsvImage(:,:,2) <= satMax) & ...
+          (hsvImage(:,:,3) >= valMin & hsvImage(:,:,3) <= valMax);
+
+% Display the lip mask to verify detection
+figure;
+imshow(lipMask);
+title('Lip Mask');
+
+% Change the lip color by modifying the hue, sturation channels
+color = 0.01;                                                                      % Desired new hue value for lips (e.g., 0.05 for red color)%0.9 pink , 0.8 purple, 0.2 green,1.2 black
+hsvImage(:,:,1) = hsvImage(:,:,1) .* ~lipMask + color * lipMask;                  % Set hue in the lip region
+hsvImage(:,:,2) = hsvImage(:,:,2) .* ~lipMask + 0.8 * lipMask;                    % Increase saturation in the lip region
+imshow(hsvImage)
+title('Color change HSV Image')
+
+% Convert modified HSV image back to RGB color space
+newImage = hsv2rgb(hsvImage);
+
+% Display the result
+figure;
+imshow(newImage);
+title('Output Image');

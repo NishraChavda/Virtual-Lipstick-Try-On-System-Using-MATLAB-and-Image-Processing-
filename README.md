@@ -1,5 +1,6 @@
 # Virtual-Lipstick-Try-On-System-Using-MATLAB-and-Image-Processing
 This project implements a Virtual Lipstick Try-On System using MATLAB and image processing techniques. The system allows users to visualize different lipstick shades by detecting and recoloring lips in an image using HSV color space.
+
 **Overview**
 
 This project uses image processing to detect lips using HSV color space, applying custom colors to simulate different lipstick shades. It is useful for virtual makeup applications.

@@ -27,6 +27,10 @@ Color Application: The hue and saturation values in the lip region are adjusted.
 
 Display Results: The modified image is converted back to RGB and displayed using imshow().
 
+**Flow Chart**
+![Screenshot 2024-11-04 123159](https://github.com/user-attachments/assets/57d5ea9c-b83b-454e-9522-f1b6321aa333)
+
+
 **Results**
 
 Original Image: Displayed first for reference.

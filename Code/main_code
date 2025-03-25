@@ -1,6 +1,6 @@
 clc;clear all;
 % Load the image
-image = imread('Nishra.jpg'); 
+image = imread('image.jpg'); 
 imshow(image)
 title('Original Image');
 
